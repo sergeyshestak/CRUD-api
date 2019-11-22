@@ -1,112 +1,104 @@
-const Note = require('../models/note.model');
+const NoteService = require('../services/note.service');
 
-exports.create = (req, res) => {
-
-    if (!req.body.content) {
-        return res.status(400).send({
-            message: "Note content can not be empty."
-        });
+class NoteController {
+    constructor() {
+        this.noteService = new NoteService();
     }
 
-    const note = new Note({
-        title: req.body.title || "Untitle Note.",
-        content: req.body.content
-    });
+    async create(req, res) {
+        try {
+            if (!req || !req.body || !req.body.title || !req.body.content) {
+                throw new Error('Wrong params.');
+            }
 
-    note.save()
-    .then(data => {
-        res.send(data);
-    }).catch(err => {
-        res.status(500).send({
-            message: "Some error ocurred while creating the Note/"
-        });
-    });
-};
+            const { title, content } = req.body;
 
-exports.findAll = (req, res) => {
-    
-    Note.find()
-    .then(notes => {
-        res.send(notes);
-    }).catch(err => {
-        res.status(500).send({
-            message: err.message || "Some error ocurred while retrieving notes."
-        });
-    });
-};
+            const result = await this.noteService.create(title, content);
 
-exports.findOne = (req, res) => {
-
-    Note.findById(req.params.noteId)
-    .then(note => {
-        if (!note) {
-            return res.status(404).send({
-                message: "Note not found with id " + req.params.noteId
+            res.send({
+                result,
+                error: null,
+            });
+        } catch (e) {
+            res.status(400).send({
+                result: null,
+                error: e.message,
             });
         }
-        res.send(note);
-    }).catch(err => {
-        if (err.kind === "ObjectId") { 
-            return res.status(404).send({
-                message: "Note not found with id " + req.params.noteId
-            });
-        }
-        
-        return res.status(500).send({
-            message: "Error retrieving note with id " + req.params.noteId
-        });
-    });
-}
-
-exports.update = (req, res) => {
-
-    if(!req.body.content) {
-        return res.status(400).send({
-            message: "Note content can not be empty"
-        });
     }
 
-    Note.findByIdAndUpdate(req.params.noteId, {
-        title: req.body.title || "Untitled Note",
-        content: req.body.content
-    }, {new: true})
-    .then(note => {
-        if(!note) {
-            return res.status(404).send({
-                message: "Note not found with id " + req.params.noteId
+    async findAll(req, res) {
+        try {
+            const result = await this.noteService.findAll();
+
+            res.send({
+                result,
+                error: null,
+            });
+        } catch (e) {
+            res.status(400).send({
+                result: null,
+                error: e.message,
             });
         }
-        res.send(note);
-    }).catch(err => {
-        if(err.kind === 'ObjectId') {
-            return res.status(404).send({
-                message: "Note not found with id " + req.params.noteId
-            });                
-        }
-        return res.status(500).send({
-            message: "Error updating note with id " + req.params.noteId
-        });
-    });
-}
+    }
 
-exports.delete = (req, res) => {
+    async findOneById(req, res) {
+        try {
+            const { noteId } = req.params;
+            const result = await this.noteService.findOneById(noteId);
 
-    Note.findByIdAndRemove(req.params.noteId)
-    .then(note => {
-        if(!note) {
-            return res.status(404).send({
-                message: "Note not found with id " + req.params.noteId
+            res.send({
+                result,
+                error: null,
+            });
+        } catch (e) {
+            res.status(400).send({
+                result: null,
+                error: e.message,
             });
         }
-        res.send({message: "Note deleted successfully!"});
-    }).catch(err => {
-        if(err.kind === 'ObjectId' || err.name === 'NotFound') {
-            return res.status(404).send({
-                message: "Note not found with id " + req.params.noteId
-            });                
+    }
+
+    async updateById(req, res) {
+        try {
+            if (!req || !req.body || !req.body.title || !req.body.content) {
+                throw new Error('Wrong params.');
+            }
+
+            const { title, content } = req.body;
+            const { noteId } = req.params;
+
+            const result = await this.noteService.updateById(title, content, noteId);
+
+            res.send({
+                result,
+                error: null,
+            });
+        } catch (e) {
+            res.status(400).send({
+                result: null,
+                error: e.message,
+            });
         }
-        return res.status(500).send({
-            message: "Could not delete note with id " + req.params.noteId
-        });
-    });
+    }
+
+    async deleteById(req, res) {
+        try {
+            const { noteId } = req.params;
+            const result = await this.noteService.deleteById(noteId);
+
+            res.send({
+                result,
+                error: null,
+            });
+        } catch (e) {
+            res.status(400).send({
+                result: null,
+                error: e.message,
+            });
+        }
+    }
 }
+
+module.exports = NoteController;

@@ -2,9 +2,9 @@ const mongose = require('mongoose');
 
 const NoteSchema = mongose.Schema({
     title: String,
-    content: String
+    content: String,
 }, {
-    timestamps: true
+    timestamps: true,
 });
 
 module.exports = mongose.model('Note', NoteSchema);

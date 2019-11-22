@@ -1,14 +1,15 @@
+const NoteController = require('../controllers/note.controller.js');
+
 module.exports = (app) => {
-    const notes = require('../controllers/note.controller.js');
+    const notes = new NoteController();
 
-    app.post('/notes', notes.create);
+    app.post('/notes', notes.create.bind(notes));
 
-    app.get('/notes', notes.findAll);
+    app.get('/notes', notes.findAll.bind(notes));
 
-    app.get('/note/:noteId', notes.findOne);
+    app.get('/notes/:noteId', notes.findOneById.bind(notes));
 
-    app.put('/notes/:noteId', notes.update);
+    app.put('/notes/:noteId', notes.updateById.bind(notes));
 
-    app.delete('/notes/:noteId', notes.delete);
-    
-}
+    app.delete('/notes/:noteId', notes.deleteById.bind(notes));
+};
