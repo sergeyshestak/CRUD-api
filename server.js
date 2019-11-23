@@ -1,9 +1,7 @@
 const app = require('express')();
 const http = require('http').createServer(app);
-// const io = require('socket.io')(http);
 const bodyParser = require('body-parser');
 const webSocket = require('ws');
-
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -32,8 +30,14 @@ http.listen(3000, () => {
     console.log('Server is listening on port 3000');
 });
 
-const wss = new webSocket.Server({ http });
+const wss = new webSocket.Server({ port: 3333 });
 
-wss.on('connection', (socket) => {
+wss.on('connection', (ws) => {
     console.log('a user connected');
+    ws.on('close', () => {
+        console.log('zalupka');
+    });
+    ws.on('message', (e) => {
+        console.log(e);
+    });
 });
