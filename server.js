@@ -35,7 +35,7 @@ const wss = new webSocket.Server({ port: 3333 });
 wss.on('connection', (ws) => {
     console.log('a user connected');
     ws.on('close', () => {
-        console.log('zalupka');
+        console.log('a user disconnected');
     });
     ws.on('message', (e) => {
         console.log(e);
