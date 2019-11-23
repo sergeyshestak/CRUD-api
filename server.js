@@ -1,7 +1,9 @@
-const express = require('express');
+const app = require('express')();
+const http = require('http').createServer(app);
+// const io = require('socket.io')(http);
 const bodyParser = require('body-parser');
+const webSocket = require('ws');
 
-const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -26,6 +28,12 @@ app.get('/', (req, res) => {
 
 require('./app/routers/note.routers')(app);
 
-app.listen(3000, () => {
+http.listen(3000, () => {
     console.log('Server is listening on port 3000');
+});
+
+const wss = new webSocket.Server({ http });
+
+wss.on('connection', (socket) => {
+    console.log('a user connected');
 });
